@@ -5,6 +5,7 @@ import Home from './page/Home'
 import Truck from './page/Truck'
 import Signup from './auth/Signup'
 import Login from './auth/Login'
+import Use from './auth/Use'
 function App() {
   return (
     <>
@@ -14,12 +15,10 @@ function App() {
       <Route   path="/truck"   element={<Truck/>}  />
       <Route   path="/signup"   element={<Signup/>}  />
       <Route   path="/login"   element={<Login/>}  />
+      <Route   path="/use"   element={<Use/>}  />
     </Routes>
-    
-    
     </BrowserRouter>
-    
-    
+  
     </>
   )
 }
