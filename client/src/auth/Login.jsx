@@ -2,68 +2,53 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const [formData, setFormData] = useState({
-    email: "test@gmail.com",
-    password: "password",
-  });
-
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+    let [l,setL]=useState({
+      email:"test@gmail.com",
+      password:"12345"
     });
-  };
-
-  
-  async function submitHandler() {
-    try {
-      const res = await fetch("http://localhost:4040/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    let api="http://40.0.20.123:4040/login"
+    let navigate=useNavigate();
+  async function submitHandler(){
+    console.log(l);
+    let res=await fetch(api,{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
         },
-        body: JSON.stringify(formData),
-      });
+        body:JSON.stringify(l),
+    })
 
-      const dataText = await res.text();
-      console.log("res =", dataText);
-
-      if (dataText === "Login successful") {
+    let data=await res.text();
+    console.log(" api response : "+data);
+    if(data=="Login successful"){
+        alert(" Login sucess ..✅");
         navigate("/admin");
-      } else {
-        alert(dataText);
-      }
-    } catch (error) {
-      console.error("Login error:", error);
+        
+
     }
+
   }
-
   return (
-    <div>
-      <h3>Login</h3>
-
-      <input
-        type="text"
-        name="email"
-        placeholder="email"
-        value={formData.email}
-        onChange={handleChange}
-      />
-      <br />
-
-      <input
-        type="password"
-        name="password"
-        placeholder="password"
-        value={formData.password}
-        onChange={handleChange}
-      />
-      <br /><br />
-
-      <button onClick={submitHandler}>Login</button>
-    </div>
+    <>
+      <div>
+        <h3>Login</h3>
+        <input
+          type="text"
+          placeholder="email"
+         onChange={(e)=>{setL({...l,email:e.target.value})}}
+        />
+        <br />
+        <input
+          type="text"
+          placeholder="password"
+               onChange={(e)=>{setL({...l,password:e.target.value})}}
+        />
+        <br />
+        <br />
+        <button onClick={submitHandler}>submit</button>
+        <br />
+      </div>
+    </>
   );
 }
 
