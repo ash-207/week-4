@@ -20,6 +20,8 @@ async function login(){
         password:p,
     }
 
+    sessionStorage.setItem("login-cred",JSON.stringify(obj));
+
     console.log(" data: "+JSON.stringify(obj,null,2));
 
     let res=await fetch(api,{
@@ -34,6 +36,7 @@ async function login(){
     console.log(" api response : "+data);
     if(data=="Login successful"){
         alert(" Login sucess ..✅");
-        
+        window.location.href="/admin.html";
+
     }
 }
