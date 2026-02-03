@@ -1,6 +1,8 @@
 package com.example.myapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,9 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
+
+import com.example.myapp.dto.LoginRequest;
 import com.example.myapp.dto.SignupRequest;
 import com.example.myapp.model.User;
 import com.example.myapp.repo.UserRepository;
+import com.example.myapp.security.JwtService;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -46,6 +51,44 @@ public class Authentication {
         return db.findAll();
     }
 
+    @Autowired
+    JwtService jwt;
+
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> login(
+            @RequestBody LoginRequest data) {
+
+        Map<String, String> res = new HashMap<>();
+
+        Optional<User> optionalUser = db.findByEmail(data.getEmail());
+
+        // ❌ user not found
+        if (optionalUser.isEmpty()) {
+            res.put("message", "User not found");
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(res);
+        }
+
+        User user = optionalUser.get();
+
+        // ❌ invalid password
+        if (!user.getPassword().equals(data.getPassword())) {
+            res.put("message", "Invalid password");
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(res);
+        }
+
+        // ✅ generate token
+        String token = jwt.generateToken(user.getEmail());
+
+        res.put("token", token);
+        res.put("message", "Login successful");
+
+        return ResponseEntity.ok(res);
+    }
+
     @PutMapping("/user/{id}")
     public Map<Object, Object> updateUser(
             @PathVariable Long id,
@@ -74,15 +117,15 @@ public class Authentication {
     }
 
     @DeleteMapping("/user/{id}")
-    public Map<Object ,Object>  deleteUser(@PathVariable Long id){
-        Map<Object,Object> res=new HashMap<>();
-        Optional<User> op=db.findById(id);
-        if(op.isEmpty()){
-            res.put("msg","user not found ");
-            res.put("sucess","failed to delete ");
+    public Map<Object, Object> deleteUser(@PathVariable Long id) {
+        Map<Object, Object> res = new HashMap<>();
+        Optional<User> op = db.findById(id);
+        if (op.isEmpty()) {
+            res.put("msg", "user not found ");
+            res.put("sucess", "failed to delete ");
         }
         db.deleteById(id);
-        
+
         return res;
     }
 

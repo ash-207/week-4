@@ -1,10 +1,12 @@
 import React, { use, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
   let [n, setN] = useState("test");
   let [e, setE] = useState("test@gmail.com");
   let [p, setP] = useState("password");
 
+  let ng=useNavigate();
 async  function submitHandler() {
     let objData = {
       name: n,
@@ -24,7 +26,10 @@ async  function submitHandler() {
     )
     let dataText=await res.text();
     console.log("\n\t res = "+dataText)
-
+    if(res.ok){
+      alert(" signup sucess ...✅ ");
+      ng("/login")
+    }
     }catch{
       console.log("\n\t error")
     }
