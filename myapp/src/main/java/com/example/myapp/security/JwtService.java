@@ -20,34 +20,14 @@ public class JwtService {
 
     // 🔐 TOKEN VALID FOR 30 SECONDS
     public String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(
-                        new Date(System.currentTimeMillis() + 30 * 1000) // ✅ 30 sec
-                )
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
+       
     }
 
     public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        
     }
 
     public String extractUsername(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        
     }
 }
