@@ -19,13 +19,6 @@ public class Index {
     R m() {
         return new R();
     }
-    @Autowired
-    UserRepository db;
-    @GetMapping("/test")
-    ResponseEntity<?> getall(){
-        List<User> l=db.findAll();
-
-        return ResponseEntity.status(HttpStatus.ok).body(l);
-    }
+    
 
 }

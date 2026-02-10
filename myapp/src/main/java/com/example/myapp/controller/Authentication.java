@@ -20,6 +20,7 @@ import com.example.myapp.model.User;
 import com.example.myapp.repo.UserRepository;
 import com.example.myapp.security.JwtService;
 
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
@@ -27,6 +28,8 @@ public class Authentication {
 
     @Autowired
     UserRepository db;
+    @Autowired
+    JwtService jwtService;
 
     @PostMapping("/signup")
     String m(@RequestBody SignupRequest obj) {
@@ -45,50 +48,33 @@ public class Authentication {
         return "signup sucess";
     }
 
+    @PostMapping("/login")
+    public Map<Object, Object> login(@RequestBody LoginRequest req) {
+        Map<Object, Object> res = new HashMap<>();
+        Optional<User> op = db.findByEmail(req.getEmail());
+        if (op.isEmpty()) {
+            res.put("message", "Invalid credentials");
+            return res;
+        }
+        User user = op.get();
+        if (!user.getPassword().equals(req.getPassword())) {
+            res.put("message", "Invalid credentials");
+            return res;
+        }
+        String token = jwtService.generateToken(user.getEmail());
+        res.put("token", token);
+        return res;
+    }
+
     @GetMapping("/users")
     List<User> getALlUsers() {
 
         return db.findAll();
     }
 
-    @Autowired
-    JwtService jwt;
+  
 
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(
-            @RequestBody LoginRequest data) {
-
-        Map<String, String> res = new HashMap<>();
-
-        Optional<User> optionalUser = db.findByEmail(data.getEmail());
-
-        // ❌ user not found
-        if (optionalUser.isEmpty()) {
-            res.put("message", "User not found");
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(res);
-        }
-
-        User user = optionalUser.get();
-
-        // ❌ invalid password
-        if (!user.getPassword().equals(data.getPassword())) {
-            res.put("message", "Invalid password");
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(res);
-        }
-
-        // ✅ generate token
-        String token = jwt.generateToken(user.getEmail());
-
-        res.put("token", token);
-        res.put("message", "Login successful");
-
-        return ResponseEntity.ok(res);
-    }
-
+   
     @PutMapping("/user/{id}")
     public Map<Object, Object> updateUser(
             @PathVariable Long id,
